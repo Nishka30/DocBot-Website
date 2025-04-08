@@ -1,98 +1,256 @@
 "use client";
-
-import { motion } from 'framer-motion';
-import { Brain, Activity, Clock } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { Brain, Activity, Clock, Shield, Heart, Zap, Sparkles } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 
 const HeroSection = () => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollY } = useScroll();
+  
+  const y = useTransform(scrollY, [0, 300], [0, -50]);
+  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      setMousePosition({ x: x - 0.5, y: y - 0.5 });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  const particlesArray = Array.from({ length: 20 }, (_, i) => i);
+
+  // Define the icons to render in the orbiting elements
+  const orbitIcons = [
+    <Brain key="brain" className="h-6 w-6" />,
+    <Activity key="activity" className="h-6 w-6" />,
+    <Clock key="clock" className="h-6 w-6" />,
+    <Shield key="shield" className="h-6 w-6" />,
+    <Heart key="heart" className="h-6 w-6" />,
+    <Zap key="zap" className="h-6 w-6" />
+  ];
+
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 to-indigo-50 pt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 lg:grid-cols-2 gap-12">
+    <div 
+      ref={containerRef}
+      className="relative min-h-screen overflow-hidden bg-gradient-to-br from-blue-950 via-indigo-900 to-violet-900 pt-16"
+    >
+      {/* Animated background particles */}
+      {particlesArray.map((i) => (
         <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-          className="flex flex-col justify-center"
+          key={i}
+          className="absolute w-2 h-2 bg-blue-500/20 rounded-full"
+          animate={{
+            x: [
+              Math.random() * window.innerWidth,
+              Math.random() * window.innerWidth,
+            ],
+            y: [
+              Math.random() * window.innerHeight,
+              Math.random() * window.innerHeight,
+            ],
+            scale: [0.5, 1, 0.5],
+            opacity: [0.2, 0.5, 0.2],
+          }}
+          transition={{
+            duration: Math.random() * 10 + 20,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        />
+      ))}
+
+      {/* Main content */}
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <motion.div
+          style={{ y, opacity }}
+          className="relative z-10"
         >
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 leading-tight mb-6">
-            Revolutionizing Healthcare with{" "}
-            <span className="text-blue-600">AI</span>
-          </h1>
-          <p className="text-xl text-gray-600 mb-8">
-            Your Smart Doctor, Available 24/7. Experience the future of healthcare
-            with AI-powered diagnostics and personalized care.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <button className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 text-lg">
-              Get Started
-            </button>
-            <button className="border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-lg hover:bg-blue-50 transition-colors duration-200 text-lg">
-              Watch Demo
-            </button>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="mb-8"
+          >
+            <div className="flex items-center space-x-2 mb-6">
+              <span className="px-3 py-1 bg-blue-500/20 rounded-full text-blue-300 text-sm font-medium">
+                AI-Powered Healthcare
+              </span>
+              <Sparkles className="h-5 w-5 text-blue-400" />
+            </div>
+            <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight mb-6">
+              The Future of
+              <div className="relative inline-block ml-4">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 animate-gradient-x">
+                  Healthcare
+                </span>
+                <motion.div
+                  className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg opacity-20 blur-lg"
+                  animate={{
+                    scale: [1, 1.1, 1],
+                    opacity: [0.2, 0.3, 0.2],
+                  }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                  }}
+                />
+              </div>
+            </h1>
+            <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+              Experience revolutionary AI-driven diagnostics and personalized care that's
+              available 24/7. Welcome to healthcare that never sleeps.
+            </p>
+          </motion.div>
+
+          <div className="flex flex-wrap gap-6">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="group relative px-8 py-4 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-xl overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-white/20 transform group-hover:translate-y-32 transition-transform duration-500" />
+              <div className="relative flex items-center space-x-2">
+                <Zap className="h-5 w-5 text-white" />
+                <span className="text-white font-semibold">Get Started Now</span>
+              </div>
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="group relative px-8 py-4 bg-white/10 backdrop-blur-lg rounded-xl border border-white/20"
+            >
+              <div className="relative flex items-center space-x-2">
+                <Shield className="h-5 w-5 text-blue-300" />
+                <span className="text-blue-100 font-semibold">Watch Demo</span>
+              </div>
+            </motion.button>
           </div>
+
+          {/* Stats */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="grid grid-cols-3 gap-6 mt-12"
+          >
+            {[
+              { value: "99%", label: "Accuracy", icon: <Brain className="h-5 w-5" /> },
+              { value: "24/7", label: "Support", icon: <Clock className="h-5 w-5" /> },
+              { value: "50K+", label: "Users", icon: <Heart className="h-5 w-5" /> }
+            ].map((stat, index) => (
+              <div 
+                key={stat.label}
+                className="bg-white/5 backdrop-blur-lg rounded-xl p-4 border border-white/10"
+              >
+                <div className="text-blue-300 mb-2">{stat.icon}</div>
+                <div className="text-2xl font-bold text-white">{stat.value}</div>
+                <div className="text-blue-200 text-sm">{stat.label}</div>
+              </div>
+            ))}
+          </motion.div>
         </motion.div>
 
+        {/* 3D Interactive Visual */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
-          className="relative"
+          className="relative h-[64rem] md:h-[40rem] lg:h-96"
+          style={{
+            perspective: "1000px",
+            transformStyle: "preserve-3d",
+          }}
         >
-          <div className="relative w-full h-[500px] bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-indigo-100" />
-            <div className="relative p-8">
-              {/* Add your hero image or 3D illustration here */}
-            </div>
-          </div>
-
-          {/* Floating cards */}
           <motion.div
+            className="relative w-full h-full"
             animate={{
-              y: [0, -10, 0],
+              rotateX: mousePosition.y * 20,
+              rotateY: mousePosition.x * 20,
             }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              repeatType: "reverse",
-            }}
-            className="absolute top-10 -right-10 bg-white p-4 rounded-lg shadow-lg"
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
           >
-            <Brain className="h-8 w-8 text-blue-600 mb-2" />
-            <p className="text-sm font-semibold">AI-Powered Diagnostics</p>
-          </motion.div>
+            {/* Central Sphere */}
+            <motion.div
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64"
+              animate={{
+                scale: [1, 1.05, 1],
+                rotate: [0, 360],
+              }}
+              transition={{
+                duration: 20,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            >
+              <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-pink-500/30 backdrop-blur-3xl" />
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-2xl" />
+            </motion.div>
 
-          <motion.div
-            animate={{
-              y: [0, 10, 0],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              repeatType: "reverse",
-              delay: 0.5,
-            }}
-            className="absolute bottom-10 -left-10 bg-white p-4 rounded-lg shadow-lg"
-          >
-            <Activity className="h-8 w-8 text-green-600 mb-2" />
-            <p className="text-sm font-semibold">Real-time Monitoring</p>
-          </motion.div>
+            {/* Orbiting Elements */}
+            {[0, 60, 120, 180, 240, 300].map((degree, index) => (
+              <motion.div
+                key={degree}
+                className="absolute top-1/2 left-1/2 w-16 h-16"
+                animate={{
+                  rotate: [degree, degree + 360],
+                }}
+                transition={{
+                  duration: 20,
+                  repeat: Infinity,
+                  ease: "linear",
+                  delay: -index,
+                }}
+              >
+                <motion.div
+                  className="absolute -left-8 -top-8 w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl"
+                  whileHover={{ scale: 1.2 }}
+                  style={{
+                    rotate: -degree,
+                  }}
+                >
+                  <div className="w-full h-full flex items-center justify-center text-white">
+                    {orbitIcons[index]}
+                  </div>
+                </motion.div>
+              </motion.div>
+            ))}
 
-          <motion.div
-            animate={{
-              y: [0, -10, 0],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              repeatType: "reverse",
-              delay: 1,
-            }}
-            className="absolute bottom-40 right-10 bg-white p-4 rounded-lg shadow-lg"
-          >
-            <Clock className="h-8 w-8 text-purple-600 mb-2" />
-            <p className="text-sm font-semibold">24/7 Availability</p>
+            {/* Floating Data Points */}
+            {[...Array(8)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-3 h-3 bg-blue-400 rounded-full"
+                animate={{
+                  x: [
+                    Math.random() * 400 - 200,
+                    Math.random() * 400 - 200,
+                  ],
+                  y: [
+                    Math.random() * 400 - 200,
+                    Math.random() * 400 - 200,
+                  ],
+                  scale: [0, 1, 0],
+                  opacity: [0, 1, 0],
+                }}
+                transition={{
+                  duration: Math.random() * 3 + 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+            ))}
           </motion.div>
         </motion.div>
       </div>
+
+      {/* Bottom Gradient */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-blue-950 to-transparent" />
     </div>
   );
 };

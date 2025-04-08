@@ -1,25 +1,28 @@
-"use client";
-
-import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
+import React from 'react';
 import HeroSection from '@/components/HeroSection';
 import SymptomChecker from '@/components/SymptomChecker';
 import Features from '@/components/Features';
+import ProductsServices from '@/components/ProductsServices';
 import Parameters from '@/components/Parameters';
+import Certifications from '@/components/Certifications';
 import Testimonials from '@/components/Testimonials';
 import NewsSection from '@/components/NewsSection';
 import BookDemo from '@/components/BookDemo';
 
-export default function Home() {
+function App() {
   return (
-    <div className="w-full overflow-x-hidden">
+    <div className="min-h-screen bg-gray-50">
       <HeroSection />
+      <ProductsServices />
       <SymptomChecker />
       <Features />
       <Parameters />
+      <Certifications />
       <Testimonials />
       <NewsSection />
       <BookDemo />
     </div>
   );
 }
+
+export default App;

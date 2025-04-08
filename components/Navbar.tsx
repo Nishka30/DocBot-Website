@@ -1,18 +1,16 @@
-"use client";
-
-import { useState } from 'react';
-import Link from 'next/link';
+'use client';
+import React, { useState } from 'react';
 import { Menu, X, Stethoscope } from 'lucide-react';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
-    { name: 'Products & Services', href: '/products' },
-    { name: 'About DocBot', href: '/about' },
-    { name: 'AI Assistant', href: '/ai-assistant' },
-    { name: 'Use Cases', href: '/use-cases' },
-    { name: 'Wall of Love', href: '/testimonials' },
+    { name: 'Products & Services', href: '#products' },
+    { name: 'About DocBot', href: '#about' },
+    { name: 'AI Assistant', href: '#ai-assistant' },
+    { name: 'Use Cases', href: '#use-cases' },
+    { name: 'Wall of Love', href: '#testimonials' },
   ];
 
   return (
@@ -20,22 +18,22 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
+            <a href="/" className="flex items-center space-x-2">
               <Stethoscope className="h-8 w-8 text-blue-600" />
               <span className="text-xl font-bold text-gray-900">DocBot</span>
-            </Link>
+            </a>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
-              <Link
+              <a
                 key={item.name}
                 href={item.href}
                 className="text-gray-600 hover:text-blue-600 transition-colors duration-200"
               >
                 {item.name}
-              </Link>
+              </a>
             ))}
             <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
               Book Demo
@@ -58,14 +56,14 @@ const Navbar = () => {
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {navItems.map((item) => (
-                <Link
+                <a
                   key={item.name}
                   href={item.href}
                   className="block px-3 py-2 text-gray-600 hover:text-blue-600 transition-colors duration-200"
                   onClick={() => setIsOpen(false)}
                 >
                   {item.name}
-                </Link>
+                </a>
               ))}
               <button className="w-full mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
                 Book Demo
