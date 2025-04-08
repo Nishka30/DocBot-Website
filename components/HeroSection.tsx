@@ -1,11 +1,11 @@
+
 "use client";
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Brain, Activity, Clock, Shield, Heart, Zap, Sparkles } from 'lucide-react';
+import { Brain, Activity, Clock, Shield, Heart, Zap, Sparkles, Stethoscope } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
 const HeroSection = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
   
@@ -26,8 +26,6 @@ const HeroSection = () => {
   }, []);
 
   const particlesArray = Array.from({ length: 20 }, (_, i) => i);
-
-  // Define the icons to render in the orbiting elements
   const orbitIcons = [
     <Brain key="brain" className="h-6 w-6" />,
     <Activity key="activity" className="h-6 w-6" />,
@@ -40,7 +38,7 @@ const HeroSection = () => {
   return (
     <div 
       ref={containerRef}
-      className="relative min-h-screen overflow-hidden bg-gradient-to-br from-blue-950 via-indigo-900 to-violet-900 pt-16"
+      className="relative min-h-[90vh] overflow-hidden bg-gradient-to-br from-blue-950 via-indigo-900 to-violet-900 pt-16"
     >
       {/* Animated background particles */}
       {particlesArray.map((i) => (
@@ -190,6 +188,21 @@ const HeroSection = () => {
             >
               <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-pink-500/30 backdrop-blur-3xl" />
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-2xl" />
+              {/* Company Logo */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <motion.div
+                  animate={{
+                    opacity: [0.4, 0.6, 0.4],
+                  }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                >
+                  <Stethoscope className="w-24 h-24 text-white/60" />
+                </motion.div>
+              </div>
             </motion.div>
 
             {/* Orbiting Elements */}
