@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
@@ -10,6 +10,7 @@ import {
   Activity,
   Zap,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const Features = () => {
   const [ref, inView] = useInView({
@@ -19,6 +20,18 @@ const Features = () => {
 
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 300], [0, -50]);
+
+  const [isClient, setIsClient] = useState(false);
+  const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    // Only runs on client
+    setIsClient(true);
+    setScreenSize({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+  }, []);
 
   const features = [
     {
@@ -73,32 +86,34 @@ const Features = () => {
 
   return (
     <div className="py-20 bg-gradient-to-br from-blue-950 via-indigo-900 to-violet-900 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-blue-500/20 rounded-full"
-            animate={{
-              x: [
-                Math.random() * window.innerWidth,
-                Math.random() * window.innerWidth,
-              ],
-              y: [
-                Math.random() * window.innerHeight,
-                Math.random() * window.innerHeight,
-              ],
-              scale: [0.5, 1, 0.5],
-              opacity: [0.2, 0.5, 0.2],
-            }}
-            transition={{
-              duration: Math.random() * 10 + 20,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-        ))}
-      </div>
+      {/* Only render animated background on client */}
+      {isClient && (
+        <div className="absolute inset-0 overflow-hidden">
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-blue-500/20 rounded-full"
+              animate={{
+                x: [
+                  Math.random() * screenSize.width,
+                  Math.random() * screenSize.width,
+                ],
+                y: [
+                  Math.random() * screenSize.height,
+                  Math.random() * screenSize.height,
+                ],
+                scale: [0.5, 1, 0.5],
+                opacity: [0.2, 0.5, 0.2],
+              }}
+              transition={{
+                duration: Math.random() * 10 + 20,
+                repeat: Infinity,
+                ease: 'linear',
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div

@@ -47,29 +47,29 @@ const NewsSection = () => {
     <div className="py-20 bg-gradient-to-br from-blue-950 via-indigo-900 to-violet-900 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-blue-500/20 rounded-full"
-            animate={{
-              x: [
-                Math.random() * window.innerWidth,
-                Math.random() * window.innerWidth,
-              ],
-              y: [
-                Math.random() * window.innerHeight,
-                Math.random() * window.innerHeight,
-              ],
-              scale: [0.5, 1, 0.5],
-              opacity: [0.2, 0.5, 0.2],
-            }}
-            transition={{
-              duration: Math.random() * 10 + 20,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-        ))}
+      {typeof window !== "undefined" &&
+  [...Array(20)].map((_, i) => {
+    const randomX = Math.random() * window.innerWidth;
+    const randomY = Math.random() * window.innerHeight;
+    return (
+      <motion.div
+        key={i}
+        className="absolute w-2 h-2 bg-blue-500/20 rounded-full"
+        animate={{
+          x: [randomX, Math.random() * window.innerWidth],
+          y: [randomY, Math.random() * window.innerHeight],
+          scale: [0.5, 1, 0.5],
+          opacity: [0.2, 0.5, 0.2],
+        }}
+        transition={{
+          duration: Math.random() * 10 + 20,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+      />
+    );
+  })}
+
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
