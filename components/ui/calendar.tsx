@@ -2,22 +2,20 @@
 
 import * as React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { DayPicker, NavbarProps } from 'react-day-picker';
+import { DayPicker, NavProps } from 'react-day-picker';
 
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
-// ✅ Custom Navbar for navigation buttons
-function CustomNavbar({ goToMonth, displayMonth }: NavbarProps) {
+// ✅ Custom Navbar using correct type
+function CustomNavbar({ onPreviousClick, onNextClick }: NavProps) {
   return (
     <div className="space-x-1 flex items-center absolute right-1">
       <button
         type="button"
-        onClick={() =>
-          goToMonth(new Date(displayMonth.getFullYear(), displayMonth.getMonth() - 1))
-        }
+        onClick={() => onPreviousClick()}
         className={cn(
           buttonVariants({ variant: 'outline' }),
           'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100'
@@ -27,9 +25,7 @@ function CustomNavbar({ goToMonth, displayMonth }: NavbarProps) {
       </button>
       <button
         type="button"
-        onClick={() =>
-          goToMonth(new Date(displayMonth.getFullYear(), displayMonth.getMonth() + 1))
-        }
+        onClick={() => onNextClick()}
         className={cn(
           buttonVariants({ variant: 'outline' }),
           'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100'
@@ -86,7 +82,7 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        Navbar: CustomNavbar, // ✅ use the custom navbar here
+        Navbar: CustomNavbar, // ✅ use the correct navbar component
       }}
       {...props}
     />
