@@ -15,7 +15,7 @@ function CustomNavbar({ onPreviousClick, onNextClick }: NavProps) {
     <div className="space-x-1 flex items-center absolute right-1">
       <button
         type="button"
-        onClick={() => onPreviousClick()}
+        //onClick={() => onPreviousClick()}
         className={cn(
           buttonVariants({ variant: 'outline' }),
           'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100'
@@ -25,7 +25,7 @@ function CustomNavbar({ onPreviousClick, onNextClick }: NavProps) {
       </button>
       <button
         type="button"
-        onClick={() => onNextClick()}
+        //onClick={() => onNextClick()}
         className={cn(
           buttonVariants({ variant: 'outline' }),
           'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100'
@@ -82,7 +82,7 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        Navbar: CustomNavbar, // ✅ use the correct navbar component
+       // Navbar: CustomNavbar, // ✅ use the correct navbar component
       }}
       {...props}
     />
