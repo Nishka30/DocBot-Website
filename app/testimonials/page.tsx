@@ -12,6 +12,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import api from '@/lib/axios';
 
+// Define the testimonial interface
+interface Testimonial {
+  _id: string;
+  name: string;
+  email: string;
+  message: string;
+  rating: number;
+  isVisible: boolean;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
 const testimonialSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email"),
@@ -20,7 +33,7 @@ const testimonialSchema = z.object({
 });
 
 const TestimonialsPage = () => {
-  const [testimonials, setTestimonials] = useState([]);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [selectedRating, setSelectedRating] = useState(5);
@@ -94,15 +107,15 @@ const TestimonialsPage = () => {
       // Check what format the data is in
       if (Array.isArray(response.data)) {
         // If it's directly an array
-        setTestimonials(response.data);
+        setTestimonials(response.data as Testimonial[]);
       } else if (response.data && response.data.testimonials) {
         // If testimonials are in a property called "testimonials"
         if (Array.isArray(response.data.testimonials)) {
           // If testimonials is an array
-          setTestimonials(response.data.testimonials);
+          setTestimonials(response.data.testimonials as Testimonial[]);
         } else {
           // If testimonials is a single object, put it in an array
-          setTestimonials([response.data.testimonials]);
+          setTestimonials([response.data.testimonials] as Testimonial[]);
         }
       } else {
         // Fallback if data structure is unexpected
@@ -133,8 +146,17 @@ const TestimonialsPage = () => {
       reset();
       setSelectedRating(5);
       
-      // After submission, fetch the updated list of testimonials
-      fetchTestimonials();
+      // Add new testimonial to the state if the response contains it
+      if (response.data && response.data.testimonials) {
+        // Create a new array with the new testimonial added
+        setTestimonials(prev => {
+          const newTestimonial = response.data.testimonials as Testimonial;
+          return [...prev, newTestimonial];
+        });
+      } else {
+        // Fetch all testimonials if we can't directly add the new one
+        fetchTestimonials();
+      }
     } catch (error) {
       console.error('Error submitting testimonial:', error);
       toast.error("Failed to submit testimonial. Please try again.");
@@ -326,31 +348,37 @@ const TestimonialsPage = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {testimonials.map((testimonial, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="group relative bg-white/5 backdrop-blur-lg rounded-2xl p-6 hover:transform hover:scale-105 transition-all duration-300"
-                >
-                  <Quote className="absolute top-4 right-4 h-8 w-8 text-blue-400/20" />
-                  <div className="relative z-10">
-                    <h3 className="text-xl font-semibold text-white">{testimonial.name}</h3>
-                    <p className="text-white/80 italic mt-4">{testimonial.message}</p>
-                    <div className="flex items-center mt-4">
-                      {Array.from({ length: testimonial.rating }).map((_, i) => (
-                        <Star
-                          key={i}
-                          className="w-5 h-5 text-yellow-400 fill-yellow-400"
-                        />
-                      ))}
+              {Array.isArray(testimonials) && testimonials.length > 0 ? (
+                testimonials.map((testimonial, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                    className="group relative bg-white/5 backdrop-blur-lg rounded-2xl p-6 hover:transform hover:scale-105 transition-all duration-300"
+                  >
+                    <Quote className="absolute top-4 right-4 h-8 w-8 text-blue-400/20" />
+                    <div className="relative z-10">
+                      <h3 className="text-xl font-semibold text-white">{testimonial.name}</h3>
+                      <p className="text-white/80 italic mt-4">{testimonial.message}</p>
+                      <div className="flex items-center mt-4">
+                        {Array.from({ length: testimonial.rating }).map((_, i) => (
+                          <Star
+                            key={i}
+                            className="w-5 h-5 text-yellow-400 fill-yellow-400"
+                          />
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </motion.div>
-              ))}
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </motion.div>
+                ))
+              ) : (
+                <div className="col-span-full text-center text-white text-xl py-12">
+                  No testimonials available yet. Be the first to share your experience!
+                </div>
+              )}
             </div>
           )}
         </div>
