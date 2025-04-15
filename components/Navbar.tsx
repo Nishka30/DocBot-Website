@@ -24,7 +24,7 @@ const Navbar = () => {
   const navItems = [
     { name: 'Products & Services', href: '/#products' },
     { name: 'About DocBot', href: '/about' },
-    { name: 'AI Assistant', href: '/#ai-assistant' },
+    { name: 'AI Assistant', href: '/ai-assistant' },
     { name: 'Use Cases', href: '/#use-cases' },
     { name: 'Wall of Love', href: '/testimonials' },
   ];

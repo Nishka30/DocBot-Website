@@ -1,7 +1,8 @@
 "use client";
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Brain, Activity, Clock, Shield, Heart, Zap, Sparkles, Stethoscope } from 'lucide-react';
+import { Brain, Activity, Clock, Shield, Heart, Zap, Sparkles } from 'lucide-react';
 import { useState, useEffect, useRef, useMemo } from 'react';
+import Image from 'next/image';
 
 const HeroSection = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -176,8 +177,25 @@ const HeroSection = () => {
                 <motion.div
                   animate={{ opacity: [0.4, 0.6, 0.4] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  className="relative w-26 h-28 overflow-hidden"
                 >
-                  <Stethoscope className="w-24 h-24 text-white/60" />
+                  {/* Replace this with your company logo */}
+                  <Image 
+                    src="/images/logo.jpg" 
+                    alt="Company Logo" 
+                    width={100} 
+                    height={100} 
+                    className="object-contain"
+                  />
+                  
+                  {/* If you want to use a fallback method if Image is not available or for dev purposes */}
+                  {/* <div className="absolute inset-0 flex items-center justify-center">
+                    <img 
+                      src="/path-to-your-logo.png" 
+                      alt="Company Logo" 
+                      className="w-24 h-24 object-contain"
+                    />
+                  </div> */}
                 </motion.div>
               </div>
             </motion.div>

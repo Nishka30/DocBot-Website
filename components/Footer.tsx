@@ -19,7 +19,7 @@ const Footer = () => {
     company: [
       { name: 'About Us', href: '/about' },
       { name: 'Careers', href: '/careers' },
-      { name: 'Press', href: '/press' },
+      { name: 'Our Presence', href: 'testimonials' },
       { name: 'Blog', href: '/blog' },
     ],
     product: [
@@ -59,15 +59,15 @@ const Footer = () => {
             <div className="space-y-4">
               <div className="flex items-center space-x-3 text-gray-400">
                 <Mail className="h-5 w-5" />
-                <span>contact@docbot.ai</span>
+                <span>contact@docbot.in</span>
               </div>
               <div className="flex items-center space-x-3 text-gray-400">
                 <Phone className="h-5 w-5" />
-                <span>+1 (555) 123-4567</span>
+                <span>+91 9881437689</span>
               </div>
               <div className="flex items-center space-x-3 text-gray-400">
-                <MapPin className="h-5 w-5" />
-                <span>123 AI Boulevard, Silicon Valley, CA 94025</span>
+                <MapPin className="h-15 w-15" />
+                <span>04,Ambika Apartment,Hare Krishna Marg,Model Colony,Shivaji Nagar, Pune, Maharashtra - 411016</span>
               </div>
             </div>
           </div>
