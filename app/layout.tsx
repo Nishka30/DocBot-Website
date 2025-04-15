@@ -9,6 +9,16 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'DocBot - AI-Powered Healthcare Platform',
   description: 'Your Smart Doctor, Available 24/7',
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/images/logo.jpg', sizes: '16x16', type: 'image/jpg' },
+      { url: '/images/logo.jpg', sizes: '32x32', type: 'image/jpg' },
+    ],
+    apple: [
+      { url: '/images/logo.jpg', sizes: '180x180' }
+    ],
+  }
 };
 
 export default function RootLayout({
