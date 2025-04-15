@@ -63,7 +63,7 @@ function App() {
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY}`,
+          "Authorization": `Bearer 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`,
           "Content-Type": "application/json",
           "HTTP-Referer": window.location.origin,
           "X-Title": "Medical Assistant"
