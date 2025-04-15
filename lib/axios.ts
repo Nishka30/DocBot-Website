@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with custom config
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: 'https://website-backend-dtvb.onrender.com/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },

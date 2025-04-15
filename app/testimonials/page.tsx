@@ -1,52 +1,147 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
-import { Star, Quote, Award, Newspaper, Camera, Heart } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Quote, Loader2, Star } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import api from '@/lib/axios';
+
+const testimonialSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+  rating: z.number().min(1, "Rating must be at least 1").max(5, "Rating cannot exceed 5"),
+});
 
 const TestimonialsPage = () => {
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
+  const [testimonials, setTestimonials] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [selectedRating, setSelectedRating] = useState(5);
+
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm({
+    resolver: zodResolver(testimonialSchema),
+    defaultValues: {
+      rating: 5
+    }
   });
-
-  const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 300], [0, -50]);
-
-  const testimonials = [
-    {
-      name: "Dr. Sarah Johnson",
-      role: "Chief Medical Officer",
-      image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=300",
-      quote: "DocBot has revolutionized how we approach patient care. The AI-powered diagnostics have significantly improved our accuracy and response time.",
-      rating: 5,
-      color: "from-blue-500 to-purple-500",
-      location: "New York Presbyterian Hospital"
-    },
-    // ... more testimonials
-  ];
 
   const mediaFeatures = [
     {
-      name: "TechCrunch",
-      logo: "https://images.unsplash.com/photo-1557200134-90327ee9fafa?auto=format&fit=crop&w=200",
-      title: "DocBot: Revolutionizing Healthcare with AI",
-      link: "#",
-      date: "March 2025"
+      name: "Hindustan Bytes",
+      title: "Your Health is Their Mission: DocBot",
+      link: "https://www.hindustanbytes.com/your-health-is-their-mission-docbot",
+      date: "2024"
     },
-    // ... more media features
+    {
+      name: "Jaipur Bytes",
+      title: "Your Health is Their Mission: DocBot",
+      link: "https://www.jaipurbytes.com/your-health-is-their-mission-docbot",
+      date: "2024"
+    },
+    {
+      name: "Business Press",
+      title: "Your Health is Their Mission: DocBot",
+      link: "https://businesspress.in/your-health-is-their-mission-docbot/",
+      date: "2024"
+    },
+    {
+      name: "Bhau.org",
+      title: "Congratulation to All Startups",
+      link: "https://bhau.org/events/congratulation-to-all-startups/",
+      date: "2024"
+    }
   ];
 
   const docbotMoments = [
     {
-      title: "First Million Users Celebration",
-      image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800",
-      description: "Our team celebrating the milestone of reaching 1 million users globally",
-      date: "January 2025"
+      title: "Emergency Care",
+      description: "Quick response times in critical situations",
+      image: "/images/kiosk-people.jpg"
     },
-    // ... more moments
+    {
+      title: "Patient Consultation",
+      description: "Personalized care and attention",
+      image: "/images/patient-consultation.jpg"
+    },
+    {
+      title: "Digital Health",
+      description: "Modern healthcare solutions",
+      image: "/images/opening.jpg"
+    }
   ];
+
+  useEffect(() => {
+    fetchTestimonials();
+  }, []);
+
+  const handleRatingClick = (rating: number) => {
+    setSelectedRating(rating);
+    setValue('rating', rating);
+  };
+
+  const fetchTestimonials = async () => {
+    try {
+      const response = await api.get('/testimonials/');
+      console.log('API response:', response.data);
+      
+      // Check what format the data is in
+      if (Array.isArray(response.data)) {
+        // If it's directly an array
+        setTestimonials(response.data);
+      } else if (response.data && response.data.testimonials) {
+        // If testimonials are in a property called "testimonials"
+        if (Array.isArray(response.data.testimonials)) {
+          // If testimonials is an array
+          setTestimonials(response.data.testimonials);
+        } else {
+          // If testimonials is a single object, put it in an array
+          setTestimonials([response.data.testimonials]);
+        }
+      } else {
+        // Fallback if data structure is unexpected
+        console.error('Unexpected response format:', response.data);
+        setTestimonials([]);
+      }
+      
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching testimonials:', error);
+      toast.error("Failed to load testimonials");
+      setLoading(false);
+    }
+  };
+
+  const onSubmit = async (data) => {
+    setSubmitting(true);
+    try {
+      const testimonialData = {
+        name: data.name,
+        email: data.email,
+        message: data.message,
+        rating: Number(data.rating)
+      };
+      
+      const response = await api.post('/testimonials/', testimonialData);
+      toast.success("Testimonial submitted successfully!");
+      reset();
+      setSelectedRating(5);
+      
+      // After submission, fetch the updated list of testimonials
+      fetchTestimonials();
+    } catch (error) {
+      console.error('Error submitting testimonial:', error);
+      toast.error("Failed to submit testimonial. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-950 via-indigo-900 to-violet-900">
@@ -91,40 +186,173 @@ const TestimonialsPage = () => {
         </div>
       </motion.div>
 
-      {/* Testimonials Grid */}
+      {/* DocBot Moments */}
       <section className="py-20 px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-4xl font-bold text-white text-center mb-16"
+          >
+            DocBot Moments
+          </motion.h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {docbotMoments.map((moment, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="group relative bg-white/5 backdrop-blur-lg rounded-2xl p-6 hover:transform hover:scale-105 transition-all duration-300"
+                className="relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-lg"
               >
-                <Quote className="absolute top-4 right-4 h-8 w-8 text-blue-400/20" />
-                <div className="relative z-10">
+                <div className="aspect-video relative">
                   <img
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    className="w-20 h-20 rounded-full object-cover mb-4 border-2 border-white/20"
+                    src={moment.image}
+                    alt={moment.title}
+                    className="object-cover w-full h-full"
                   />
-                  <h3 className="text-xl font-semibold text-white">{testimonial.name}</h3>
-                  <p className="text-blue-200 mb-2">{testimonial.role}</p>
-                  <p className="text-blue-300 text-sm mb-4">{testimonial.location}</p>
-                  <div className="flex mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                    ))}
-                  </div>
-                  <p className="text-white/80 italic">{testimonial.quote}</p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="p-6">
+                  <h3 className="text-xl font-semibold text-white mb-2">{moment.title}</h3>
+                  <p className="text-blue-200">{moment.description}</p>
+                </div>
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Add Testimonial Form */}
+      <section className="py-20 px-4">
+        <div className="max-w-2xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-white/5 backdrop-blur-lg rounded-2xl p-8"
+          >
+            <h2 className="text-3xl font-bold text-white mb-6 text-center">Share Your Experience</h2>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div>
+                <Input
+                  {...register("name")}
+                  placeholder="Your Name"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                />
+                {errors.name && (
+                  <p className="text-red-400 text-sm mt-1">{errors.name.message}</p>
+                )}
+              </div>
+              
+              <div>
+                <Input
+                  {...register("email")}
+                  type="email"
+                  placeholder="Email Address"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                />
+                {errors.email && (
+                  <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>
+                )}
+              </div>
+
+              <div>
+                <Textarea
+                  {...register("message")}
+                  placeholder="Your Message"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                  rows={4}
+                />
+                {errors.message && (
+                  <p className="text-red-400 text-sm mt-1">{errors.message.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  Rating
+                </label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((rating) => (
+                    <button
+                      key={rating}
+                      type="button"
+                      onClick={() => handleRatingClick(rating)}
+                      className="focus:outline-none"
+                    >
+                      <Star
+                        className={`w-8 h-8 ${
+                          rating <= selectedRating
+                            ? 'text-yellow-400 fill-yellow-400'
+                            : 'text-gray-400'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+                {errors.rating && (
+                  <p className="text-red-400 text-sm mt-1">{errors.rating.message}</p>
+                )}
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                disabled={submitting}
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  "Submit Testimonial"
+                )}
+              </Button>
+            </form>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Testimonials Grid */}
+      <section className="py-20 px-4">
+        <div className="max-w-7xl mx-auto">
+          {loading ? (
+            <div className="flex justify-center items-center">
+              <Loader2 className="h-8 w-8 animate-spin text-white" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {testimonials.map((testimonial, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="group relative bg-white/5 backdrop-blur-lg rounded-2xl p-6 hover:transform hover:scale-105 transition-all duration-300"
+                >
+                  <Quote className="absolute top-4 right-4 h-8 w-8 text-blue-400/20" />
+                  <div className="relative z-10">
+                    <h3 className="text-xl font-semibold text-white">{testimonial.name}</h3>
+                    <p className="text-white/80 italic mt-4">{testimonial.message}</p>
+                    <div className="flex items-center mt-4">
+                      {Array.from({ length: testimonial.rating }).map((_, i) => (
+                        <Star
+                          key={i}
+                          className="w-5 h-5 text-yellow-400 fill-yellow-400"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -139,7 +367,7 @@ const TestimonialsPage = () => {
           >
             Featured In
           </motion.h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {mediaFeatures.map((feature, index) => (
               <motion.a
                 key={index}
@@ -152,53 +380,10 @@ const TestimonialsPage = () => {
                 transition={{ delay: index * 0.1 }}
                 className="group relative bg-white/5 backdrop-blur-lg rounded-xl p-6 hover:bg-white/10 transition-all duration-300"
               >
-                <img
-                  src={feature.logo}
-                  alt={feature.name}
-                  className="w-full h-12 object-contain mb-4 grayscale group-hover:grayscale-0 transition-all duration-300"
-                />
-                <h3 className="text-white font-medium text-sm text-center">{feature.title}</h3>
+                <h3 className="text-white font-medium text-lg text-center mb-2">{feature.name}</h3>
+                <p className="text-blue-200 text-sm text-center">{feature.title}</p>
                 <p className="text-blue-300 text-xs text-center mt-2">{feature.date}</p>
               </motion.a>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* DocBot Moments */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold text-white mb-4">Moments at DocBot</h2>
-            <p className="text-xl text-blue-200">Celebrating our journey and milestones</p>
-          </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {docbotMoments.map((moment, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="group relative overflow-hidden rounded-2xl"
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-950 to-transparent z-10" />
-                <img
-                  src={moment.image}
-                  alt={moment.title}
-                  className="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-300"
-                />
-                <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
-                  <h3 className="text-xl font-semibold text-white mb-2">{moment.title}</h3>
-                  <p className="text-blue-200 text-sm">{moment.description}</p>
-                  <p className="text-blue-300 text-xs mt-2">{moment.date}</p>
-                </div>
-              </motion.div>
             ))}
           </div>
         </div>
