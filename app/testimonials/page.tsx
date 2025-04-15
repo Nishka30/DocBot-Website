@@ -25,6 +25,9 @@ interface Testimonial {
   __v: number;
 }
 
+// Define the form data schema type
+type TestimonialFormData = z.infer<typeof testimonialSchema>;
+
 const testimonialSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email"),
@@ -38,7 +41,7 @@ const TestimonialsPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [selectedRating, setSelectedRating] = useState(5);
 
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm({
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<TestimonialFormData>({
     resolver: zodResolver(testimonialSchema),
     defaultValues: {
       rating: 5
@@ -131,7 +134,7 @@ const TestimonialsPage = () => {
     }
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: TestimonialFormData) => {
     setSubmitting(true);
     try {
       const testimonialData = {
