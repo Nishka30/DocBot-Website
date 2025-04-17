@@ -1,17 +1,12 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Stethoscope } from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const pathname = usePathname();
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
@@ -21,11 +16,20 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const scrollToDemo = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const demoSection = document.getElementById('book-demo-section');
+    if (demoSection) {
+      demoSection.scrollIntoView({ behavior: 'smooth' });
+      setIsOpen(false); // Close mobile menu if open
+    }
+  };
+
   const navItems = [
     { name: 'Products & Services', href: '/products' },
     { name: 'About DocBot', href: '/about' },
     { name: 'AI Assistant', href: '/ai-assistant' },
-    { name: 'Use Cases', href: '/#use-cases' },
+    { name: 'Use Cases', href: '/use-cases' },
     { name: 'Wall of Love', href: '/testimonials' },
   ];
 
@@ -38,20 +42,20 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2 group">
+            <a href="/" className="flex items-center space-x-2 group">
               <Stethoscope className={`h-8 w-8 transition-colors duration-200 ${
                 scrolled ? 'text-blue-400' : 'text-blue-300'
               }`} />
               <span className={`text-xl font-bold transition-colors duration-200 ${
                 scrolled ? 'text-white' : 'text-white'
               } group-hover:text-blue-400`}>DocBot</span>
-            </Link>
+            </a>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
-              <Link
+              <a
                 key={item.name}
                 href={item.href}
                 className={`transition-colors duration-200 ${
@@ -61,9 +65,12 @@ const Navbar = () => {
                 }`}
               >
                 {item.name}
-              </Link>
+              </a>
             ))}
-            <button className="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 text-white px-4 py-2 rounded-xl hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-200">
+            <button 
+              onClick={scrollToDemo}
+              className="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 text-white px-4 py-2 rounded-xl hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-200"
+            >
               Book Demo
             </button>
           </div>
@@ -84,16 +91,19 @@ const Navbar = () => {
           <div className="md:hidden absolute top-16 left-0 right-0 bg-white/10 backdrop-blur-lg border-t border-white/10">
             <div className="px-2 pt-2 pb-3 space-y-1">
               {navItems.map((item) => (
-                <Link
+                <a
                   key={item.name}
                   href={item.href}
                   className="block px-3 py-2 text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-colors duration-200"
                   onClick={() => setIsOpen(false)}
                 >
                   {item.name}
-                </Link>
+                </a>
               ))}
-              <button className="w-full mt-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 text-white px-4 py-2 rounded-xl hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-200">
+              <button 
+                onClick={scrollToDemo}
+                className="w-full mt-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 text-white px-4 py-2 rounded-xl hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-200"
+              >
                 Book Demo
               </button>
             </div>

@@ -1,8 +1,9 @@
 "use client";
-
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Calendar, Clock, Users, Monitor } from 'lucide-react';
+import api from '@/lib/axios'; // Adjust the import based on your project structure
 
 const BookDemo = () => {
   const [ref, inView] = useInView({
@@ -10,8 +11,48 @@ const BookDemo = () => {
     threshold: 0.1,
   });
 
+  const [formData, setFormData] = useState({
+    name: '',
+    work_email: '',
+    organization: '',
+    message: '',
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setSuccess(false);
+
+    try {
+      await api.post('/demo-request', formData);
+      setSuccess(true);
+      setFormData({
+        name: '',
+        work_email: '',
+        organization: '',
+        message: '',
+      });
+    } catch (err) {
+      setError('Failed to submit the form. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="py-20 bg-gradient-to-br from-blue-900 to-indigo-900 text-white">
+    <section id="book-demo-section" className="py-20 bg-gradient-to-br from-blue-900 to-indigo-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <motion.div
@@ -76,50 +117,79 @@ const BookDemo = () => {
             className="bg-white/10 backdrop-blur-lg rounded-2xl p-8"
           >
             <h3 className="text-2xl font-bold mb-6">Book Your Demo</h3>
-            <form className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium mb-2">Full Name</label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-3 bg-white/5 border border-blue-400/30 rounded-lg focus:outline-none focus:border-blue-400 text-white"
-                  placeholder="John Doe"
-                />
+            {success ? (
+              <div className="text-green-400 p-4 rounded-lg bg-green-400/10 mb-4">
+                Thank you for your interest! We'll get back to you shortly.
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Work Email</label>
-                <input
-                  type="email"
-                  className="w-full px-4 py-3 bg-white/5 border border-blue-400/30 rounded-lg focus:outline-none focus:border-blue-400 text-white"
-                  placeholder="john@company.com"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Organization</label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-3 bg-white/5 border border-blue-400/30 rounded-lg focus:outline-none focus:border-blue-400 text-white"
-                  placeholder="Company Name"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Message (Optional)</label>
-                <textarea
-                  className="w-full px-4 py-3 bg-white/5 border border-blue-400/30 rounded-lg focus:outline-none focus:border-blue-400 text-white"
-                  rows={4}
-                  placeholder="Tell us about your specific needs..."
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 rounded-lg transition-colors duration-200"
-              >
-                Schedule Demo
-              </button>
-            </form>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {error && (
+                  <div className="text-red-400 p-4 rounded-lg bg-red-400/10 mb-4">
+                    {error}
+                  </div>
+                )}
+                <div>
+                  <label className="block text-sm font-medium mb-2">Full Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-white/5 border border-blue-400/30 rounded-lg focus:outline-none focus:border-blue-400 text-white"
+                    placeholder="John Doe"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Work Email</label>
+                  <input
+                    type="email"
+                    name="work_email"
+                    value={formData.work_email}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-white/5 border border-blue-400/30 rounded-lg focus:outline-none focus:border-blue-400 text-white"
+                    placeholder="john@company.com"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Organization</label>
+                  <input
+                    type="text"
+                    name="organization"
+                    value={formData.organization}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-white/5 border border-blue-400/30 rounded-lg focus:outline-none focus:border-blue-400 text-white"
+                    placeholder="Company Name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Message (Optional)</label>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-white/5 border border-blue-400/30 rounded-lg focus:outline-none focus:border-blue-400 text-white"
+                    rows={4}
+                    placeholder="Tell us about your specific needs..."
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 rounded-lg transition-colors duration-200 ${
+                    loading ? 'opacity-75 cursor-not-allowed' : ''
+                  }`}
+                >
+                  {loading ? 'Submitting...' : 'Schedule Demo'}
+                </button>
+              </form>
+            )}
           </motion.div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
