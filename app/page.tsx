@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import HeroSection from '@/components/HeroSection';
 import SymptomChecker from '@/components/SymptomChecker';
@@ -9,7 +10,7 @@ import Testimonials from '@/components/Testimonials';
 import NewsSection from '@/components/NewsSection';
 import BookDemo from '@/components/BookDemo';
 
-function App() {
+export default function Page() {
   return (
     <div className="min-h-screen bg-gray-50">
       <HeroSection />
@@ -24,5 +25,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
